@@ -1,4 +1,4 @@
-# Excercise 8 from book D3.js in action using Alpine.js
+# Excercise from chapter 8 of book D3.js in action using Alpine.js
  
  This is my take on this excercise using fasthtml and alpine.js. 
  
