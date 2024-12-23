@@ -1,6 +1,7 @@
 from fasthtml.common import FastHTML, serve, Script, H1, H2, Div, Button, Link, A
 from charts.common import COMMON_MARGIN
 from charts.scatterplot import scatterplot
+from charts.barchart import barchart
 
 alpine = Script(src="//unpkg.com/alpinejs", defer=True)
 
@@ -76,7 +77,7 @@ def scatter_plot():
 
 @app.get("/charts/barchart")
 def bar_chart():
-    return H2("Awareness")
+    return (H2("Awareness"), barchart(COMMON_MARGIN))
 
 
 @app.get("/")
@@ -101,26 +102,17 @@ def home():
                             Div(
                                 Div(
                                     Div(
-                                        "loading ...",
-                                        hx_get="/charts/scatterplot",
+                                        (H2("Retention vs Usage"), scatterplot(COMMON_MARGIN)),
                                         id="scatterplot",
                                         cls="card",
-                                        hx_trigger="load",
-                                        hx_swap="innerHTML",
-                                        **{
-                                            "hx-on::before-swap": "Alpine.stopObservingMutations();",
-                                            "hx-on::after-swap": "polyfillTemplates(event.target);Alpine.initTree(event.target);Alpine.startObservingMutations();",
-                                        },
                                     ),
                                     cls="col-12",
                                 ),
                                 Div(
                                     Div(
-                                        hx_get="/charts/barchart",
+                                        (H2("Awareness"), barchart(COMMON_MARGIN)),
                                         id="barchart",
-                                        cls="card dataPlot  ",
-                                        hx_trigger="renderPlot",
-                                        hx_swap="innerHTML",
+                                        cls="card",
                                     ),
                                     cls="col-12",
                                 ),
