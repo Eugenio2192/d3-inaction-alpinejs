@@ -51,13 +51,3 @@ def barchart(margin: Dict[str, int]):
         }
         
     )
-
-"""
-      {#each awarenessData as framework (framework.id)}
-        <Rectangle
-          x={xScale(framework.name)}
-          y={yScale(framework.awareness_percentage)}
-          width={xScale.bandwidth()}
-          height={innerHeight - yScale(framework.awareness_percentage)}
-          fill={colorScale(framework.id)}
-        />"""
