@@ -69,6 +69,6 @@ def scatterplot(margin: Dict[str, int]):
         height=height,
         **{
             "x-data": f"scatterplot({innerWidth}, {innerHeight})",
-            "x-init": "$watch('$store.framework.data', value => render(value))"
+            "x-init": "$watch('$store.frameworks.data', value => render(value))",
         },
     )

@@ -3,17 +3,15 @@ const dataURL = "https://d3js-in-action-third-edition.github.io/hosted-data/apis
 
 window.polyfillTemplates(null);
 
-document.addEventListener('alpine:init', () => {
-Alpine.store('framework', {
+document.addEventListener("alpine:init", () => {
+
+Alpine.store('frameworks', {
     selected: 'satisfaction',
     data: [],
     colorScale: () => "black",
     loaded: false
 });
 
-});
-
-document.addEventListener("alpine:init", () => {
 Alpine.data("scatterplot", (width, height) => ({
     circles: [],
     width: width,
@@ -26,18 +24,17 @@ Alpine.data("scatterplot", (width, height) => ({
     yticks: [],
     render(value) {
         let data = value.experience;
-        console.log(data);
         this.xScale
             .domain([0, d3.max(data, d => d.user_count)])
             .range([0, this.width]);
         this.yScale
             .domain([0, 100])
-            .range([height, 0]);
+            .range([this.height, 0]);
         this.xticks = this.xScale.ticks(this.width/100);
         this.yticks = this.yScale.ticks(this.height/50);
         this.circles = data.map(d => {return {x: this.xScale(d.user_count), 
                                               y: this.yScale(d.retention_percentage),
-                                              f: this.$store.framework.colorScale(d.id)} });
+                                              f: this.$store.frameworks.colorScale(d.id)} });
     },
 }));
 
@@ -65,7 +62,7 @@ Alpine.data("barchart", (width, height) => ({
             .padding(0.2);
         this.yScale
             .domain([0, 100])
-            .range([height, 0]);
+            .range([this.height, 0]);
         this.yticks = this.yScale.ticks(this.height/50);
         this.xtickMap = awarness_data.map((d) => [d.id, d.label]);
         this.bars = awarness_data.map(d => {
@@ -74,19 +71,47 @@ Alpine.data("barchart", (width, height) => ({
             y: this.yScale(d.awarness_percentage),
             width: this.xScale.bandwidth(),
             height: this.height - this.yScale(d.awarness_percentage),
-            fill: this.$store.framework.colorScale(d.id)
+            fill: this.$store.frameworks.colorScale(d.id)
         }})
     }
 }));
 
-}) ;
+Alpine.data("rankings", (width, height) => ({
+    data: [],
+    width: width,
+    height: height,
+    xlabel: "User Count",
+    ylabel: "Retention %",
+    xScale: d3.scalePoint(),
+    yScale: d3.scalePoint(),
+    lineGenerator: d3.line(),
+    years: [],
+    render(value) {
+        let data = value.experience; 
+        this.xScale = d3.scalePoint()
+            .domain(value.years)
+            .range([0, this.width]);
+        this.yScale = d3.scalePoint()
+            .domain(d3.range(1, value.ids.length +1))
+            .range([0, this.height]);
+        this.years = value.years;
+        this.lineGenerator
+            .x(d => this.xScale(d["year"]))
+            .y(d => this.yScale(d["rank"]))
+            .defined(d => d["rank"] !== null)
+            .curve(d3.curveMonotoneX);
+        console.log(this.lineGenerator(data[1]["satisfaction"]));
+        this.data = data;
+    },
+}));
 
+}); 
 document.addEventListener('DOMContentLoaded', () => {
     d3.json(dataURL).then(data => {
                     console.log(data);
-                    Alpine.store("framework").data = data
-                    Alpine.store("framework").loaded = true;
-                    Alpine.store("framework").colorScale = d3.scaleOrdinal()
+                    Alpine.store("frameworks").data = data
+                    Alpine.store("frameworks").loaded = true;
+                    Alpine.store("frameworks").colorScale = d3.scaleOrdinal()
                     .domain(data.ids.map(d => d))
                     .range(d3.schemeTableau10);
                     });

@@ -2,6 +2,7 @@ from fasthtml.common import FastHTML, serve, Script, H1, H2, Div, Button, Link, 
 from charts.common import COMMON_MARGIN
 from charts.scatterplot import scatterplot
 from charts.barchart import barchart
+from charts.rankings import rankings
 
 alpine = Script(src="//unpkg.com/alpinejs", defer=True)
 
@@ -48,7 +49,7 @@ def button(label, id, active):
         cls="button",
         **{
             "x-data": data,
-            ":class": "$store.framework.selected == framework && 'active'",
+            ":class": "$store.frameworks.selected == framework && 'active'",
         },
     )
 
@@ -62,22 +63,7 @@ def ranking_filters():
         )
         for rf in ranking_fs
     ]
-    return Div(*buttons, cls="ranking-filters")
-
-
-@app.get("/charts/rankings")
-def rankings():
-    return (H2("Rankings"), ranking_filters())
-
-
-@app.get("/charts/scatterplot")
-def scatter_plot():
-    return (H2("Retention vs Usage"), scatterplot(COMMON_MARGIN))
-
-
-@app.get("/charts/barchart")
-def bar_chart():
-    return (H2("Awareness"), barchart(COMMON_MARGIN))
+    return Div(*buttons, rankings(COMMON_MARGIN), cls="ranking-filters")
 
 
 @app.get("/")
@@ -90,11 +76,9 @@ def home():
                     (
                         Div(
                             Div(
-                                hx_get="/charts/rankings",
+                                (H2("Rankings"), ranking_filters()),
                                 id="rankings",
                                 cls="card",
-                                hx_trigger="renderPlot",
-                                hx_swap="innerHTML",
                             ),
                             cls="col-9",
                         ),
@@ -102,7 +86,10 @@ def home():
                             Div(
                                 Div(
                                     Div(
-                                        (H2("Retention vs Usage"), scatterplot(COMMON_MARGIN)),
+                                        (
+                                            H2("Retention vs Usage"),
+                                            scatterplot(COMMON_MARGIN),
+                                        ),
                                         id="scatterplot",
                                         cls="card",
                                     ),
