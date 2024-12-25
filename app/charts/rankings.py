@@ -36,6 +36,46 @@ def rankings(margin: Dict[str, int]):
                                 "x-bind:d": "lineGenerator(framework[$store.frameworks.selected])",
                             },
                         ),
+                        Template(
+                            Text(
+                                x=-25,
+                                text_anchor="end",
+                                alignment_baseline="middle",
+                                font_weight="bold",
+                                **{
+                                    "x-text": "framework.name",
+                                    "x-bind:y": "yScale(framework[$store.frameworks.selected][0].rank)",
+                                    "x-bind:fill": "$store.frameworks.colorScale(framework.id)",
+                                },
+                            ),
+                            **{"x-if": "framework[$store.frameworks.selected][0].rank"},
+                        ),
+                        Text(
+                            text_anchor="start",
+                            alignment_baseline="middle",
+                            font_weight="bold",
+                            **{
+                                "x-text": "framework.name",
+                                "x-bind:x": "width + 25",
+                                "x-bind:y": "yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)",
+                                "x-bind:fill": "$store.frameworks.colorScale(framework.id)",
+                            },
+                        ),
+                        Template(
+                            Template(
+                                G(
+                                    Circle(fill="white", r="18px", stroke_width="3px", **{"x-bind:stroke": "$store.frameworks.colorScale(framework.id)"}),
+                                    Text(x_text='Math.round(entry.percentage_question) + "%"', text_anchor="middle", alignment_baseline="middle", fill="#374f5e", font_size="12px"),
+                                    **{
+                                        "x-bind:transform": "`translate(${xScale(entry.year)}, ${yScale(entry.rank)})`"
+                                    },
+                                ),
+                                x_if="entry.rank",
+                            ),
+                            **{
+                                "x-for": "entry in framework[$store.frameworks.selected]"
+                            },
+                        ),
                         **{"x-bind:key": "`curve-${framework.id}`"},
                     ),
                     **{"x-for": "framework in data"},
