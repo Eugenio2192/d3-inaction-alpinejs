@@ -1,5 +1,6 @@
 from typing import Dict
-from fasthtml.svg import Circle, transformd, G, Line, Text, Path
+from fasthtml.svg import Circle, transformd, G, Line, Text, Path, ft_svg
+from fasthtml.components import Animate
 from fasthtml.common import Template
 from .common import chart_container
 
@@ -11,6 +12,7 @@ def rankings(margin: Dict[str, int]):
     marginLeft = 110
     innerWidth = width - marginLeft - marginRight
     innerHeight = height - margin["top"] - margin["bottom"]
+    dur = "0.25s"
     return chart_container(
         G(
             Template(
@@ -28,10 +30,23 @@ def rankings(margin: Dict[str, int]):
             G(
                 Template(
                     G(
-                        Path(
+                        ft_svg(
+                            "path",
+                            Animate(
+                                cls="path-animation",
+                                dur=dur,
+                                **{
+                                    "attributeName": "d",
+                                    "repeatCount": "1",
+                                    "x-bind:from": "lineGenerator(framework[$store.frameworks.previous])",
+                                    "x-bind:to": "lineGenerator(framework[$store.frameworks.selected])",
+                                },
+                            ),
+                            d="",
                             stroke_width=5,
                             fill="none",
                             **{
+                                "x-bind:id": "`path-curve-${framework.id}`",
                                 "x-bind:stroke": "$store.frameworks.colorScale(framework.id)",
                                 "x-bind:d": "lineGenerator(framework[$store.frameworks.selected])",
                             },
@@ -63,17 +78,44 @@ def rankings(margin: Dict[str, int]):
                         ),
                         Template(
                             Template(
-                                G(
-                                    Circle(fill="white", r="18px", stroke_width="3px", **{"x-bind:stroke": "$store.frameworks.colorScale(framework.id)"}),
-                                    Text(x_text='Math.round(entry.percentage_question) + "%"', text_anchor="middle", alignment_baseline="middle", fill="#374f5e", font_size="12px"),
+                                ft_svg(
+                                    "g",
+                                    Circle(
+                                        fill="white",
+                                        r="18px",
+                                        stroke_width="3px",
+                                        **{
+                                            "x-bind:stroke": "$store.frameworks.colorScale(framework.id)"
+                                        },
+                                    ),
+                                    Text(
+                                        x_text='Math.round(entry.percentage_question) + "%"',
+                                        text_anchor="middle",
+                                        alignment_baseline="middle",
+                                        fill="#374f5e",
+                                        font_size="12px",
+                                    ),
+                                    ft_svg(
+                                        "animatetransform",
+                                        cls="path-animation",
+                                        **{
+                                            "attributeType": "xml",
+                                            "attributeName": "transform",
+                                            "type": "translate",
+                                            "dur": dur,
+                                            "repeatCount": "1",
+                                            "x-bind:values": "`${xScale(framework[$store.frameworks.previous][index].year)},${yScale(framework[$store.frameworks.previous][index].rank)}; ${xScale(framework[$store.frameworks.selected][index].year)},${yScale(framework[$store.frameworks.selected][index].rank)}`",
+                                        },
+                                    ),
                                     **{
-                                        "x-bind:transform": "`translate(${xScale(entry.year)}, ${yScale(entry.rank)})`"
+                                        "x-bind:transform": "`translate(${xScale(entry.year)}, ${yScale(entry.rank)})`",
+                                        "x-bind:id": "`badge-${entry.rank}-{entry.year}`",
                                     },
                                 ),
                                 x_if="entry.rank",
                             ),
                             **{
-                                "x-for": "entry in framework[$store.frameworks.selected]"
+                                "x-for": "(entry, index) in framework[$store.frameworks.selected]"
                             },
                         ),
                         **{"x-bind:key": "`curve-${framework.id}`"},

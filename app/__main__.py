@@ -50,6 +50,7 @@ def button(label, id, active):
         **{
             "x-data": data,
             ":class": "$store.frameworks.selected == framework && 'active'",
+            "@click": '$store.frameworks.previous = $store.frameworks.selected; $store.frameworks.selected =framework; document.querySelectorAll(".path-animation").forEach((e) => e.beginElement());',
         },
     )
 

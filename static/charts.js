@@ -7,6 +7,7 @@ document.addEventListener("alpine:init", () => {
 
 Alpine.store('frameworks', {
     selected: 'satisfaction',
+    previous: "satisfaction",
     data: [],
     colorScale: () => "black",
     loaded: false
