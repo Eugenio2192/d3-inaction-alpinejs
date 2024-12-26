@@ -104,6 +104,14 @@ Alpine.data("rankings", (width, height) => ({
         console.log(this.lineGenerator(data[1]["satisfaction"]));
         this.data = data;
     },
+    updateCurve(el,data) {
+        console.log(el);
+        d3.select(el)
+            .transition()
+            .duration(400)
+            .ease(d3.easeCubicOut)
+            .attr("d", this.lineGenerator(data))
+    }
 }));
 
 }); 

@@ -1,6 +1,5 @@
 from typing import Dict
-from fasthtml.svg import Circle, transformd, G, Line, Text, Path, ft_svg
-from fasthtml.components import Animate
+from fasthtml.svg import Circle, transformd, G, Line, Text, ft_svg
 from fasthtml.common import Template
 from .common import chart_container
 
@@ -32,49 +31,47 @@ def rankings(margin: Dict[str, int]):
                     G(
                         ft_svg(
                             "path",
-                            Animate(
-                                cls="path-animation",
-                                dur=dur,
-                                **{
-                                    "attributeName": "d",
-                                    "repeatCount": "1",
-                                    "x-bind:from": "lineGenerator(framework[$store.frameworks.previous])",
-                                    "x-bind:to": "lineGenerator(framework[$store.frameworks.selected])",
-                                },
-                            ),
                             d="",
+                            cls="fmwk-curve",
                             stroke_width=5,
                             fill="none",
                             **{
                                 "x-bind:id": "`path-curve-${framework.id}`",
                                 "x-bind:stroke": "$store.frameworks.colorScale(framework.id)",
-                                "x-bind:d": "lineGenerator(framework[$store.frameworks.selected])",
+                                "x-init":"updateCurve($el,framework[$store.frameworks.selected]);$watch('framework[$store.frameworks.selected]', (data) => updateCurve($el,data))",
                             },
                         ),
                         Template(
-                            Text(
-                                x=-25,
+                            G(Text(
+                                x=0,y=0,
                                 text_anchor="end",
                                 alignment_baseline="middle",
                                 font_weight="bold",
                                 **{
                                     "x-text": "framework.name",
-                                    "x-bind:y": "yScale(framework[$store.frameworks.selected][0].rank)",
                                     "x-bind:fill": "$store.frameworks.colorScale(framework.id)",
                                 },
                             ),
+                            cls="label",
+                            **{"x-bind:style": "`transform: translate(-25px, ${yScale(framework[$store.frameworks.selected][0].rank)}px)`"}
+                            ),
                             **{"x-if": "framework[$store.frameworks.selected][0].rank"},
                         ),
-                        Text(
+                        G(Text(
+                            x=0,
+                            y=0,
                             text_anchor="start",
                             alignment_baseline="middle",
                             font_weight="bold",
                             **{
                                 "x-text": "framework.name",
-                                "x-bind:x": "width + 25",
-                                "x-bind:y": "yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)",
+                                # "x-bind:x": "width + 25",
+                                # "x-bind:y": "yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)",
                                 "x-bind:fill": "$store.frameworks.colorScale(framework.id)",
                             },
+                        ),
+                            cls="label",
+                            **{"x-bind:style": "`transform: translate(${width + 25}px, ${yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)}px)`"}
                         ),
                         Template(
                             Template(
@@ -95,18 +92,7 @@ def rankings(margin: Dict[str, int]):
                                         fill="#374f5e",
                                         font_size="12px",
                                     ),
-                                    ft_svg(
-                                        "animatetransform",
-                                        cls="path-animation",
-                                        **{
-                                            "attributeType": "xml",
-                                            "attributeName": "transform",
-                                            "type": "translate",
-                                            "dur": dur,
-                                            "repeatCount": "1",
-                                            "x-bind:values": "`${xScale(framework[$store.frameworks.previous][index].year)},${yScale(framework[$store.frameworks.previous][index].rank)}; ${xScale(framework[$store.frameworks.selected][index].year)},${yScale(framework[$store.frameworks.selected][index].rank)}`",
-                                        },
-                                    ),
+                                    cls="label",
                                     **{
                                         "x-bind:transform": "`translate(${xScale(entry.year)}, ${yScale(entry.rank)})`",
                                         "x-bind:id": "`badge-${entry.rank}-{entry.year}`",
@@ -129,6 +115,6 @@ def rankings(margin: Dict[str, int]):
         height=height,
         **{
             "x-data": f"rankings({innerWidth}, {innerHeight})",
-            "x-init": "$watch('$store.frameworks.data', value => render(value))",
+            "x-init": "$watch('$store.frameworks.data', (value) => {render(value);} );",
         },
     )
