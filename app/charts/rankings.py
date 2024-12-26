@@ -38,40 +38,47 @@ def rankings(margin: Dict[str, int]):
                             **{
                                 "x-bind:id": "`path-curve-${framework.id}`",
                                 "x-bind:stroke": "$store.frameworks.colorScale(framework.id)",
-                                "x-init":"updateCurve($el,framework[$store.frameworks.selected]);$watch('framework[$store.frameworks.selected]', (data) => updateCurve($el,data))",
+                                "x-init": "updateCurve($el,framework[$store.frameworks.selected]);$watch('framework[$store.frameworks.selected]', (data) => updateCurve($el,data))",
                             },
                         ),
                         Template(
-                            G(Text(
-                                x=0,y=0,
-                                text_anchor="end",
+                            G(
+                                Text(
+                                    x=0,
+                                    y=0,
+                                    text_anchor="end",
+                                    alignment_baseline="middle",
+                                    font_weight="bold",
+                                    **{
+                                        "x-text": "framework.name",
+                                        "x-bind:fill": "$store.frameworks.colorScale(framework.id)",
+                                    },
+                                ),
+                                cls="label",
+                                **{
+                                    "x-bind:style": "`transform: translate(-25px, ${yScale(framework[$store.frameworks.selected][0].rank)}px)`"
+                                },
+                            ),
+                            **{"x-if": "framework[$store.frameworks.selected][0].rank"},
+                        ),
+                        G(
+                            Text(
+                                x=0,
+                                y=0,
+                                text_anchor="start",
                                 alignment_baseline="middle",
                                 font_weight="bold",
                                 **{
                                     "x-text": "framework.name",
+                                    # "x-bind:x": "width + 25",
+                                    # "x-bind:y": "yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)",
                                     "x-bind:fill": "$store.frameworks.colorScale(framework.id)",
                                 },
                             ),
                             cls="label",
-                            **{"x-bind:style": "`transform: translate(-25px, ${yScale(framework[$store.frameworks.selected][0].rank)}px)`"}
-                            ),
-                            **{"x-if": "framework[$store.frameworks.selected][0].rank"},
-                        ),
-                        G(Text(
-                            x=0,
-                            y=0,
-                            text_anchor="start",
-                            alignment_baseline="middle",
-                            font_weight="bold",
                             **{
-                                "x-text": "framework.name",
-                                # "x-bind:x": "width + 25",
-                                # "x-bind:y": "yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)",
-                                "x-bind:fill": "$store.frameworks.colorScale(framework.id)",
+                                "x-bind:style": "`transform: translate(${width + 25}px, ${yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)}px)`"
                             },
-                        ),
-                            cls="label",
-                            **{"x-bind:style": "`transform: translate(${width + 25}px, ${yScale(framework[$store.frameworks.selected][framework[$store.frameworks.selected].length - 1].rank)}px)`"}
                         ),
                         Template(
                             Template(
