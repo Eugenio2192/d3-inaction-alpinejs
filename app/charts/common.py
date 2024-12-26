@@ -11,6 +11,8 @@ def chart_container(
     return Svg(
         content,
         viewBox=f"0 0 {width} {height}",
+        width="100%",
+        height="100%",
         **kwargs,
     )
 
